@@ -4,54 +4,62 @@ extern crate chinese_pinyin;
 fn test_t() {
 	let args = chinese_pinyin::Args::default();
 
-	let rr = chinese_pinyin::t("中国", &args);
-	// println!("{:?}", &*rr);
 	assert_eq!("zhong guo", chinese_pinyin::t("中国", &args));
 	assert_eq!("zhong guo english ri", chinese_pinyin::t("中国english日", &args));
 	assert_eq!("shang hai very good o ye", chinese_pinyin::t("上海very good哦耶", &args));
 }
 
-// def test_t
-//   assert_equal("zhong guo", Pinyin.t('中国'))
-  // assert_equal("zhong guo english ri", Pinyin.t('中国english日'))
-  // assert_equal("shang hai very good o ye", Pinyin.t('上海very good哦耶'))
-// end
+#[test]
+fn test_t_with_splitter() {
+	let mut args = chinese_pinyin::Args::new();
+	args.splitter = "-".to_string();
 
-// def test_t_with_splitter
-//   assert_equal("zhong-guo", Pinyin.t('中国', splitter: '-'))
-//   assert_equal("huangzhimin", Pinyin.t('黄志敏', splitter: ''))
-//   assert_equal("guang-zhou", Pinyin.t('广州', splitter: '-'))
-//   assert_equal("shang-hai", Pinyin.t('上海', splitter: '-'))
-// end
+	assert_eq!("zhong-guo", chinese_pinyin::t("中国", &args));
+	assert_eq!("guang-zhou", chinese_pinyin::t("广州", &args));
+	assert_eq!("shang-hai", chinese_pinyin::t("上海", &args));
+}
 
-// def test_t_with_tone
-//   assert_equal("zhong1 guo2", Pinyin.t('中国', tone: true))
-//   assert_equal("huang2 zhi4 min3", Pinyin.t('黄志敏', tone: true))
-//   assert_equal("shang4 hai3", Pinyin.t('上海', tone: true))
-// end
+#[test]
+fn test_t_with_tone() {
+	let mut args = chinese_pinyin::Args::new();
+	args.tone = true;
 
-// def test_t_with_camelcase
-//   assert_equal("Zhong Guo", Pinyin.t('中国', camelcase: true))
-//   assert_equal("Huang Zhi Min", Pinyin.t('黄志敏', camelcase: true))
-//   assert_equal("Zhong1 Guo2", Pinyin.t('中国', camelcase: true, tone: true))
-//   assert_equal("Huang2 Zhi4 Min3", Pinyin.t('黄志敏', camelcase: true, tone: true))
-//   assert_equal("Zhong-Guo", Pinyin.t('中国', camelcase: true, splitter: '-'))
-//   assert_equal("HuangZhiMin", Pinyin.t('黄志敏', camelcase: true, splitter: ''))
-//   assert_equal("Guang-Zhou", Pinyin.t('广州', camelcase: true, splitter: '-'))
-//   assert_equal("Shang-Hai", Pinyin.t('上海', camelcase: true, splitter: '-'))
-//   assert_equal("Shang4-Hai3", Pinyin.t('上海', camelcase: true, tone:true, splitter: '-'))
-// end
+	assert_eq!("zhong1 guo2", chinese_pinyin::t("中国", &args));
+	assert_eq!("shang4 hai3", chinese_pinyin::t("上海", &args));
+}
 
-// def test_t_with_chinese_punctuation
-//   assert_equal("ce-shi-yi-xia-Think-diff", Pinyin.t('测试一下，Think diff', splitter: '-'))
-// end
+#[test]
+fn test_t_with_camelcase() {
+	let mut args = chinese_pinyin::Args::new();
 
-// def test_t_with_tonemarks
-//   assert_equal('zhōng guó', Pinyin.t('中国', tonemarks: true))
-//   assert_equal('běi jīng', Pinyin.t('北京', tonemarks: true))
-// end
+	args.camel = true;
+	assert_eq!("Zhong Guo", chinese_pinyin::t("中国", &args));
 
-// def test_t_with_custom
-//   assert_equal('BJ', Pinyin.t('北京') { |letters| letters[0].upcase } )
-//   assert_equal('B', Pinyin.t('北京') { |letters, i| letters[0].upcase if i == 0 } )
-// end
+	args.tone = true;
+	assert_eq!("Zhong1 Guo2", chinese_pinyin::t("中国", &args));
+
+	args.splitter = "-".to_string();
+	assert_eq!("Shang4-Hai3", chinese_pinyin::t("上海", &args));
+
+	args.tone = false;
+	assert_eq!("Zhong-Guo", chinese_pinyin::t("中国", &args));
+	assert_eq!("Guang-Zhou", chinese_pinyin::t("广州", &args));
+	assert_eq!("Shang-Hai", chinese_pinyin::t("上海", &args));
+}
+
+#[test]
+fn test_t_with_chinese_punctuation() {
+	let mut args = chinese_pinyin::Args::new();
+	args.splitter = "-".to_string();
+
+  	assert_eq!("ce-shi-yi-xia，Think diff", chinese_pinyin::t("测试一下，Think diff", &args));
+}
+
+#[test]
+fn test_t_with_tonemarks() {
+	let mut args = chinese_pinyin::Args::new();
+	args.tonemarks = true;
+
+	assert_eq!("zhōng guó", chinese_pinyin::t("中国", &args));
+	assert_eq!("běi jīng", chinese_pinyin::t("北京", &args));
+}

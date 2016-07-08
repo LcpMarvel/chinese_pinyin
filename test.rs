@@ -2,7 +2,7 @@ use std::iter::FromIterator;
 
 fn main() {
 
-	let s = "中国";
+	let s = "测试一下，Think diff";
 
 	let chars: Vec<char> = s.chars().collect();
 

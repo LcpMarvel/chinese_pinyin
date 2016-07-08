@@ -16,17 +16,23 @@ const TONE_MARKS: [[&'static str; 5]; 6] = [
 ];
 
 #[derive(Debug)]
-pub struct Args<'a> {
-	pub splitter: &'a str,
+pub struct Args {
+	pub splitter: String,
 	pub tonemarks: bool,
 	pub tone: bool,
 	pub camel: bool
 }
 
-impl<'a> Default for Args<'a> {
-	fn default() -> Args<'a> {
+impl Args {
+	pub fn new() -> Args {
+		Args::default()
+	}
+}
+
+impl Default for Args {
+	fn default() -> Args {
 		Args {
-			splitter: " ",
+			splitter: " ".to_string(),
 			tonemarks: false,
 			tone: false,
 			camel: false
@@ -73,43 +79,53 @@ fn replace_vowels(string: &str, tone_index: i32) -> String {
 	string.to_string()
 }
 
-pub fn translate<'a>(characters: &str, args: &Args<'a>) -> String {
-	// let splitter = args.splitter;
-
+pub fn translate(characters: &str, args: &Args) -> String {
 	let mut results: Vec<String> = Vec::new();
-	// let mut valid_chinese = true;
+	let mut valid_chinese = true;
 
 	for c in characters.chars() {
 		let string_c = c.to_string();
 
 		if let Some(pinyin) = DATA.get(&*string_c) {
-			let pinyin_string = pinyin.to_string();
-			let tone_index = find_tone_index(&pinyin_string);
-			let without_tone_pinyin_string = truncated_pinyin(pinyin_string);
-
-			// if !valid_chinese {
-			// 	results.push(splitter);
-			// }
-			// valid_chinese = true;
-
-			if args.tone && args.tonemarks {           // 需要声调
-				results.push(
-					replace_vowels(&without_tone_pinyin_string, tone_index)
-				);
-			} else if !args.tone {                     // 不需要声调
-				results.push(without_tone_pinyin_string);
-			} else if args.camel {                     // 需要首字母大写
-				results.push(capitalize(&pinyin));
+			if !valid_chinese {
+				results.push(args.splitter.clone());
 			}
-		} else if c.is_digit(10) {
+			valid_chinese = true;
+
+			let mut pinyin_string = pinyin.to_string();
+			let tone_index = find_tone_index(&pinyin_string);
+
+			// 需要声调标注 比如 ā
+			if args.tonemarks {
+				pinyin_string = replace_vowels(&pinyin_string, tone_index);
+			}
+			// 不需要声调 比如 zhong1 后面的 1
+			if !args.tone {
+				pinyin_string = truncated_pinyin(pinyin_string.clone());
+			}
+			// 需要首字母大写
+			if args.camel {
+				pinyin_string = capitalize(&pinyin_string);
+			}
+
+			results.push(pinyin_string);
+			results.push(args.splitter.clone());
+		} else {
+			if !c.is_digit(36) && c != ' ' {
+				results.pop();
+			}
 			results.push(string_c);
+
+			valid_chinese = false;
 		}
 	}
-
+	if results[results.len() - 1] == args.splitter {
+		results.pop();
+	}
 	String::from_iter(results)
 }
 
-pub fn t<'a>(characters: &str, args: &Args<'a>) -> String {
+pub fn t(characters: &str, args: &Args) -> String {
 	translate(characters, args)
 }
 

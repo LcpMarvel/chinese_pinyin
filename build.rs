@@ -34,7 +34,7 @@ fn main() {
 		let pinyin = chars.next().unwrap();
 
 		builder.entry(
-			quote_string(chinese), &quote_string(pinyin)
+			chinese.to_string(), &quote_string(pinyin)
 		);
 	}
 
