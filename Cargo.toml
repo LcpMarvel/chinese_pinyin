@@ -1,0 +1,11 @@
+[package]
+name = "chinese_pinyin"
+version = "0.1.0"
+authors = ["lcp <lcpmarvel@gmail.com>"]
+build = "build.rs"
+
+[dependencies]
+phf = "0.7.15"
+
+[build-dependencies]
+phf_codegen = "~0.7.3"
